@@ -1,7 +1,7 @@
 Utility that provides the ability to read, write and transform messages on a AWS SQS queue
 
 Usage:
-  sqsUtility <Action> [Target] [Options]
+  sqs-utility <Action> [Target] [Options]
 
 Action:
   --list <queue url>       [-i]   list messages from queue
