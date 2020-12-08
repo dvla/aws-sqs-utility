@@ -184,7 +184,7 @@ function sqsModifyAction(sqs, options) {
 
 module.exports = async (sqs, options) => {
     if (options.help) {
-        console.log(fs.readFileSync('src/help.txt', 'UTF-8'));
+        console.log(fs.readFileSync(`${__dirname}/help.txt`, 'UTF-8'));
     } else if (options.queues) {
         await sqsListQueuesAction(sqs);
     } else if (options.describe) {
