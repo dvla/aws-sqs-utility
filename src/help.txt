@@ -1,0 +1,25 @@
+Utility that provides the ability to read, write and transform messages on a AWS SQS queue
+
+Usage:
+  sqsUtility <Action> [Target] [Options]
+
+Action:
+  --list <queue url>       [-i]   list messages from queue
+  --extract <queue url>    [-e]   extract messages from queue
+  --load <queue url>       [-l]   load messages onto queue
+  --delete <queue url>     [-d]   delete messages from queue
+  --describe <queue url>          information of the queue state
+  --queues                 [-q]   list available queues
+  --help                   [-h]   display help
+
+Target: Required for all actions except describe, queues and help
+  --file                   [-f]   file to read/write messages (CSV)
+
+Options:
+  --filter <filter>               apply Javascript message filter (see README)
+  --transform <transform>         apply Javascript message transform (see README)
+  --limit <limit>                 maximum number of messages retrieved by list/extract, default is 1000
+  --timeout <seconds>             maximum seconds to list/extract messages, default is 30
+  --region <aws region>           override default AWS region
+  --endpoint <aws endpoint url>   override default AWS endpoint URL
+  --quiet                         suppress output
