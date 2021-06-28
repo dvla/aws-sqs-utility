@@ -8,7 +8,7 @@ on:
 
 jobs:
   build:
-    runs-on: ${{ matrix.operating-sysytem }}
+    runs-on: ${{ matrix.operating-system }}
     strategy:
       matrix:
         node-version: [12.x, 14.x, 15.x, 16.x]
