@@ -1,6 +1,0 @@
-{
-  "name": "Node.js",
-  "description": "Build and test with npm.",
-  "iconName": "nodejs",
-  "categories": ["JavaScript", "Node", "Npm"]
-}
