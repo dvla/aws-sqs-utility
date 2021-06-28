@@ -1,0 +1,45 @@
+name: Node.js CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ${{ matrix.operating-sysytem }}
+    strategy:
+      matrix:
+        node-version: [12.x, 14.x, 15.x, 16.x]
+        operating-system: [macos-latest, ubuntu-latest]
+
+    services:
+      localstack:
+        image: localstack/localstack
+        env:
+          SERVICES: sqs
+          DEFAULT_REGION: eu-west-2
+          AWS_ACCESS_KEY_ID: localkey
+          AWS_SECRET_ACCESS_KEY: localsecret
+        ports:
+          - 4566:4566
+          - 4571:4571
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node-version }}
+      - run: npm install
+      - name: Test
+        run: npm test
+        with:
+          SQS_ENDPOINT: http://localstack:4566
+          S3_ENDPOINT: http://localstack:4566
+      - name: System Test
+        run: npm run system-test
+        with:
+          SQS_ENDPOINT: http://localstack:4566
+          S3_ENDPOINT: http://localstack:4566
