@@ -4,11 +4,10 @@ on: [push]
 
 jobs:
   build:
-    runs-on: ${{ matrix.operating-system }}
+    runs-on: ubuntu-latest
     strategy:
       matrix:
         node-version: [12.x, 14.x, 15.x, 16.x]
-        operating-system: [macos-latest, ubuntu-latest]
 
     services:
       localstack:
