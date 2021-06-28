@@ -1,5 +1,5 @@
 const AWS = require('aws-sdk');
-const uuid = require('uuid/v4');
+const { v4: uuid } = require('uuid');
 const { exec } = require('child_process');
 const fs = require('fs');
 const path = require('path');
