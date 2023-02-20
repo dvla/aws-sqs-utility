@@ -21,6 +21,7 @@ describe('sqsReceiveMessages', () => {
                 promise: () =>
                     Promise.resolve({
                         Messages: [
+                            // One message
                             {
                                 MessageId: 'messageId1',
                                 Attributes: {
@@ -32,6 +33,7 @@ describe('sqsReceiveMessages', () => {
                                 Body: 'body1',
                                 ReceiptHandle: 'receipthandle1',
                             },
+                            // Multiple messages
                             {
                                 MessageId: 'messageId2',
                                 Attributes: {
@@ -53,6 +55,33 @@ describe('sqsReceiveMessages', () => {
                                 Body: 'body2',
                                 ReceiptHandle: 'receipthandle2',
                             },
+                            // FIFO message
+                            {
+                                MessageId: 'messageId3',
+                                Attributes: {
+                                    SenderId: 'senderId3',
+                                    SentTimestamp: '1600961099012',
+                                    ApproximateFirstReceiveTimestamp: '1600963774776',
+                                    ApproximateReceiveCount: '5',
+                                    MessageGroupId: 'messageGroupId3',
+                                },
+                                Body: 'body3',
+                                ReceiptHandle: 'receipthandle3',
+                            },
+                            // FIFO message with deduplication ID
+                            {
+                                MessageId: 'messageId4',
+                                Attributes: {
+                                    SenderId: 'senderId4',
+                                    SentTimestamp: '1600961099012',
+                                    ApproximateFirstReceiveTimestamp: '1600963774776',
+                                    ApproximateReceiveCount: '5',
+                                    MessageGroupId: 'messageGroupId4',
+                                    MessageDeduplicationId: 'messageDeduplicationId4',
+                                },
+                                Body: 'body4',
+                                ReceiptHandle: 'receipthandle4',
+                            },
                         ],
                     }),
             })),
@@ -71,6 +100,7 @@ describe('sqsReceiveMessages', () => {
             WaitTimeSeconds: 5,
         });
 
+        // One message
         expect(messages[0]).toEqual({
             MessageId: 'messageId1',
             SenderId: 'senderId1',
@@ -81,6 +111,7 @@ describe('sqsReceiveMessages', () => {
             MessageAttributes: undefined,
             ReceiptHandle: 'receipthandle1',
         });
+        // Multiple messages
         expect(messages[1]).toEqual({
             MessageId: 'messageId2',
             SenderId: 'senderId2',
@@ -101,6 +132,32 @@ describe('sqsReceiveMessages', () => {
                 },
             },
             ReceiptHandle: 'receipthandle2',
+        });
+        // FIFO message
+        expect(messages[2]).toEqual({
+            MessageId: 'messageId3',
+            SenderId: 'senderId3',
+            Sent: '2020-09-24T15:24:59.012Z',
+            FirstReceived: '2020-09-24T16:09:34.776Z',
+            ReceiveCount: '5',
+            Body: 'body3',
+            MessageAttributes: undefined,
+            ReceiptHandle: 'receipthandle3',
+            MessageGroupId: 'messageGroupId3',
+            MessageDeduplicationId: undefined,
+        });
+        // FIFO message with deduplication ID
+        expect(messages[3]).toEqual({
+            MessageId: 'messageId4',
+            SenderId: 'senderId4',
+            Sent: '2020-09-24T15:24:59.012Z',
+            FirstReceived: '2020-09-24T16:09:34.776Z',
+            ReceiveCount: '5',
+            Body: 'body4',
+            MessageAttributes: undefined,
+            ReceiptHandle: 'receipthandle4',
+            MessageGroupId: 'messageGroupId4',
+            MessageDeduplicationId: 'messageDeduplicationId4',
         });
     });
 
@@ -212,11 +269,13 @@ describe('sqsSendMessages', () => {
     it('should send messages to queue', async () => {
         // Given
         const messages = [
+            // One message
             {
                 MessageId: 'messageId1',
                 Body: 'body1',
                 MessageAttributes: undefined,
             },
+            // Multiple messages
             {
                 MessageId: 'messageId2',
                 Body: 'body2',
@@ -233,6 +292,22 @@ describe('sqsSendMessages', () => {
                     },
                 },
             },
+            // FIFO message
+            {
+                MessageId: 'messageId3',
+                Body: 'body3',
+                MessageGroupId: 'messageGroupId3',
+                MessageDeduplicationId: undefined,
+                MessageAttributes: undefined,
+            },
+            // FIFO message with deduplication ID
+            {
+                MessageId: 'messageId4',
+                Body: 'body4',
+                MessageGroupId: 'messageGroupId4',
+                MessageDeduplicationId: 'MessageDeduplicationId4',
+                MessageAttributes: undefined,
+            },
         ];
 
         const sqs = {
@@ -248,16 +323,18 @@ describe('sqsSendMessages', () => {
         const successCount = await sqsSendMessages(messages, 'test-queue', sqs);
 
         // Then
-        expect(successCount).toEqual(2);
+        expect(successCount).toEqual(messages.length);
 
         expect(sqs.sendMessageBatch).toHaveBeenCalledWith({
             QueueUrl: 'test-queue',
             Entries: [
+                // One message
                 {
                     Id: 'messageId1',
                     MessageBody: 'body1',
                     MessageAttributes: undefined,
                 },
+                // Multiple messages
                 {
                     Id: 'messageId2',
                     MessageBody: 'body2',
@@ -273,6 +350,22 @@ describe('sqsSendMessages', () => {
                             BinaryValue: 'binaryvalue',
                         },
                     },
+                },
+                // FIFO message
+                {
+                    Id: 'messageId3',
+                    MessageBody: 'body3',
+                    MessageGroupId: 'messageGroupId3',
+                    MessageDeduplicationId: undefined,
+                    MessageAttributes: undefined,
+                },
+                // FIFO message with deduplication ID
+                {
+                    Id: 'messageId4',
+                    MessageBody: 'body4',
+                    MessageGroupId: 'messageGroupId4',
+                    MessageDeduplicationId: 'MessageDeduplicationId4',
+                    MessageAttributes: undefined,
                 },
             ],
         });
