@@ -22,7 +22,7 @@ function reduceMessageAttributes(attributes) {
 }
 
 function toCsvMessage(sqsMessage) {
-    return {
+    const csvMessage = {
         MessageId: sqsMessage.MessageId,
         SenderId: sqsMessage.Attributes.SenderId,
         Sent: toDateString(sqsMessage.Attributes.SentTimestamp),
@@ -32,14 +32,30 @@ function toCsvMessage(sqsMessage) {
         MessageAttributes: reduceMessageAttributes(sqsMessage.MessageAttributes),
         ReceiptHandle: sqsMessage.ReceiptHandle,
     };
+
+    // FIFO
+    if (sqsMessage.Attributes.MessageGroupId != null) {
+        csvMessage.MessageGroupId = sqsMessage.Attributes.MessageGroupId;
+        csvMessage.MessageDeduplicationId = sqsMessage.Attributes.MessageDeduplicationId;
+    }
+
+    return csvMessage;
 }
 
 function toSqsSend(csvMessage) {
-    return {
+    const sqsMessage = {
         Id: csvMessage.MessageId,
         MessageBody: csvMessage.Body,
         MessageAttributes: csvMessage.MessageAttributes,
     };
+
+    // FIFO
+    if (csvMessage.MessageGroupId != null) {
+        sqsMessage.MessageGroupId = csvMessage.MessageGroupId;
+        sqsMessage.MessageDeduplicationId = csvMessage.MessageDeduplicationId;
+    }
+
+    return sqsMessage;
 }
 
 function toSqsDelete(csvMessage) {
